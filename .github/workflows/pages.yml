@@ -1,10 +1,10 @@
-name: Publish web edition
+name: Publish legacy URL redirect
 
 on:
   push:
     branches: [main]
     paths:
-      - 'website/**'
+      - 'legacy-site/**'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 
@@ -18,24 +18,31 @@ concurrency:
 
 jobs:
   build:
+    if: github.repository == 'koyamahr/the-art-of-numerical-algorithms'
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: npm
-          cache-dependency-path: website/package-lock.json
       - uses: actions/configure-pages@v5
-      - run: npm ci
-        working-directory: website
-      - run: npm test
-        working-directory: website
-      - run: npm run build
-        working-directory: website
+      - name: Check destination and redirect assets
+        run: |
+          python3 - <<'PYTHON'
+          import json
+          from pathlib import Path
+          from urllib.request import urlopen
+          destination = 'https://koyamahr.github.io/numerical-methods-atlas/'
+          with urlopen(destination+'site.json', timeout=30) as response:
+              site = json.load(response)
+          assert site['publicUrl'] == destination
+          for name in ('index.html','404.html','migration.js'):
+              assert (Path('legacy-site')/name).is_file()
+          for name in ('index.html','404.html'):
+              text = (Path('legacy-site')/name).read_text()
+              assert destination in text
+              assert '/the-art-of-numerical-algorithms/migration.js' in text
+          PYTHON
       - uses: actions/upload-pages-artifact@v4
         with:
-          path: website/dist
+          path: legacy-site
 
   deploy:
     needs: build

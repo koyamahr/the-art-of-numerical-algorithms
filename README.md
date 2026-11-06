@@ -1,3 +1,7 @@
+> The current web edition is **[An Atlas of Numerical Methods](https://koyamahr.github.io/numerical-methods-atlas/)**. This repository preserves the original source history and v0.1.0 release. Its GitHub Pages site forwards existing links to the new edition, retaining language, chapter and section parameters.
+>
+> Continue development at [koyamahr/numerical-methods-atlas](https://github.com/koyamahr/numerical-methods-atlas).
+
 # The Art of Numerical Algorithms
 
 **Read the paper. Understand the method. Run the benchmark.**
